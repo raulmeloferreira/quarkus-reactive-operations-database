@@ -23,6 +23,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.HttpStatus;
+import org.eclipse.microprofile.metrics.MetricUnits;
+import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.jboss.logging.Logger;
 
 import io.smallrye.mutiny.Multi;
@@ -41,7 +44,7 @@ import rian.example.reative.database.service.AppArsenalSupportPage;
 public class AppArsenalController extends AppArsenalSupportPage {
 
 	private static final Logger logger = Logger.getLogger(AppArsenalController.class.getName());
-
+	
 	@Inject
 	AppArsenalService appArsenalService;
 
@@ -54,6 +57,8 @@ public class AppArsenalController extends AppArsenalSupportPage {
 
 	@GET
 	@Path("{id}")
+    @Counted(name = "getCount", description = "How many times get was called")
+	@Timed(name = "getTimer", description = "A measure of how long it takes to get data." , unit = MetricUnits.MILLISECONDS)
 	public Uni<Response> get(@PathParam("id") final Long id) {
 		return appArsenalService.findById(id).map(data -> {
 			if (data.getId() == null) {
@@ -87,6 +92,7 @@ public class AppArsenalController extends AppArsenalSupportPage {
 
 
 	}
+
 
 	@PUT
 	@Path("{id}")
